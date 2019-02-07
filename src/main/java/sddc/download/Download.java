@@ -30,7 +30,7 @@ public class Download {
 
     private URL url = null;
 
-    private String invalidUrl = null;
+    private String destination = null;
 
     private Status status = Status.INITIALIZED;
 
@@ -44,31 +44,9 @@ public class Download {
         FAILED
     }
 
-    public Download(URL url) {
-        this.urlString = url.toString();
-        this.url = url;
-    }
-
     public Download(String url) {
         try {
             this.urlString = url;
-            this.url = new URL(url);
-        } catch (MalformedURLException e) {
-            this.status = Status.FAILED;
-            this.error = e;
-        }
-    }
-
-    public Download(URL url, List<String> header) {
-        this.urlString = url.toString();
-        this.url = url;
-        this.header.addAll(header);
-    }
-
-    public Download(String url, List<String> header) {
-        try {
-            this.urlString = url;
-            this.header.addAll(header);
             this.url = new URL(url);
         } catch (MalformedURLException e) {
             this.status = Status.FAILED;
@@ -80,6 +58,7 @@ public class Download {
         try {
             this.urlString = request.url;
             this.header.addAll(header);
+            this.destination = request.destination;
             this.url = new URL(request.url);
         } catch (MalformedURLException e) {
             this.status = Status.FAILED;

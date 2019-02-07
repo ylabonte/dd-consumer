@@ -24,6 +24,10 @@
         "items": {
           "type": "string"
         }
+      },
+      "destination": {
+        "description": "A relative destination file path for the download.",
+        "type": "string"
       }
     },
     "required": ["url"]
