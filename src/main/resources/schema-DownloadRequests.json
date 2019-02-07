@@ -1,0 +1,31 @@
+{
+  "$id": "https://gist.github.com/ylabonte/79d36b4f17635d7661bcac75677cd216#file-downloadrequests-schema-json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DownloadRequests",
+  "description": "Simple Download Delegation format suitable for multiple downloads at a time.",
+  "type": "array",
+  "items": {
+    "title": "DownloadRequest",
+    "description": "A single download request.",
+    "type": "object",
+    "properties": {
+      "url": {
+        "description": "The download source url.",
+        "type": "string"
+      },
+      "method": {
+        "description": "Http request method to use for requesting the download.",
+        "type": "string",
+        "enum": ["GET", "POST"]
+      },
+      "header": {
+        "description": "An array of http headers to be set (eg. the cookie or auth headers for session riding).",
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": ["url"]
+  }
+}
