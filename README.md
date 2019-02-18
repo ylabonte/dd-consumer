@@ -3,7 +3,7 @@
 A [Spring](https://spring.io/) based web service consuming delegated
 downloads ([see json schema here](https://gist.github.com/ylabonte/79d36b4f17635d7661bcac75677cd216#file-downloadrequests-schema-json))
 which are http `POST`ed as `Content-Type: application/json; charset=utf-8`
-to the root route `http://<service-address>:8080/`.
+to the root route `http://<service-address>:1040/`.
 A simple `GET` request to the same route gives a brief status of all
 known downloads (current and history).
 
@@ -37,12 +37,12 @@ $ gradle test
 
 ## Request status
 ```bash
-$ curl 'localhost:8080'
+$ curl 'localhost:1040'
 ```
 
 ## Request download(s)
 ```bash
-$ curl 'localhost:8080' \
+$ curl 'localhost:1040' \
 -H 'Content-Type: application/json; charset=utf-8' \
 -d '{
   "url": "http://example.com/info.txt",

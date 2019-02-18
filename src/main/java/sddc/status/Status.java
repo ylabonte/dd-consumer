@@ -30,20 +30,8 @@ public class Status {
     private Status() {
         this.downloads = new ArrayList<>();
         try {
-            Download initialized =  new Download("http://www.example.com"),
-                     waiting = new Download("http://www.example.com"),
-                     progressing = new Download("http://www.example.com"),
-                     succeeded = new Download("http://www.example.com"),
-                     failed = new Download("http://www.example.com");
-            waiting.setStatus(Download.Status.WAITING);
-            progressing.setStatus(Download.Status.PROGRESSING);
-            succeeded.setStatus(Download.Status.SUCCEEDED);
-            failed.setStatus(Download.Status.FAILED);
-            this.downloads.add(initialized);
-            this.downloads.add(waiting);
-            this.downloads.add(progressing);
-            this.downloads.add(failed);
-            this.downloads.add(succeeded);
+//            this.downloads.add(new Download("http://www.example.com", "/tmp"));
+//            this.downloads.add(new Download("https://gist.githubusercontent.com/ylabonte/79d36b4f17635d7661bcac75677cd216/raw/7139d45328fe2300595beb946eb4d3c5647df2b7/DownloadRequests.schema.json", "/tmp"));
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }

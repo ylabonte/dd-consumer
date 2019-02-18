@@ -9,5 +9,7 @@ public class DownloadRequest {
 
     public String url = null;
 
+    public String method = "GET";
+
     public String destination = null;
 }

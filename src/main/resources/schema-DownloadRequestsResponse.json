@@ -1,0 +1,52 @@
+{
+  "$id": "https://gist.github.com/ylabonte/79d36b4f17635d7661bcac75677cd216#file-downloadrequestsresponse-schema-json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DownloadRequestsResponse",
+  "description": "Response for Simple Download Delegation format suitable for multiple downloads at a time.",
+  "type": "array",
+  "items": {
+    "title": "Download",
+    "description": "A single download representation.",
+    "type": "object",
+    "properties": {
+      "url": {
+        "description": "The download source url.",
+        "type": "string"
+      },
+      "method": {
+        "description": "Http request method to use for requesting the download.",
+        "type": "string",
+        "enum": ["GET", "POST"]
+      },
+      "header": {
+        "description": "An array of http headers to be set (eg. the cookie or auth headers for session riding).",
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "destination": {
+        "description": "A relative destination file path for the download.",
+        "type": "string"
+      },
+      "status": {
+        "description": "Download progress status",
+        "type": "string",
+        "enum": ["INITIALIZED", "WAITING", "PROGRESSING", "SUCCEEDED", "FAILED"]
+      },
+      "message": {
+        "description": "Some kind of status message. May also be an error message.",
+        "type": "string"
+      },
+      "erroneous": {
+        "description": "Whether the download is in an erroneous state.",
+        "type": "boolean"
+      },
+      "error": {
+        "description": "A java exception in json representation.",
+        "type": "object"
+      }
+    },
+    "required": ["url", "message"]
+  }
+}
