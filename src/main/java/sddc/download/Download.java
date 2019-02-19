@@ -1,19 +1,15 @@
 package sddc.download;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
@@ -27,6 +23,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
+@Scope("prototype")
 @ConfigurationProperties(prefix = "download")
 @JsonPropertyOrder({
     "url",
@@ -37,7 +35,17 @@ import java.util.regex.Pattern;
     "erroneous",
     "error"
 })
-public class Download {
+@JsonIgnoreProperties({
+    "threadGroup",
+    "contextClassLoader",
+    "stackTrace",
+    "allStackTraces",
+    "Threads",
+    "uncaughtExceptionHandler",
+    "defaultUncaughtExceptionHandler",
+    "uncaughtExceptionHandler"
+})
+public class Download extends Thread {
 
     /**
      * Placeholder message, when no error occurred
@@ -89,6 +97,14 @@ public class Download {
      */
     private File file = null;
 
+    private String basePath;
+
+    private Boolean keepExisting;
+
+    private Logger logger = LoggerFactory.getLogger(Download.class);
+
+    private String hash;
+
     /**
      * Download status values
      */
@@ -101,43 +117,7 @@ public class Download {
         FAILED
     }
 
-    private String basePath;
-
-    private Boolean keepExisting;
-
-    public void setBasePath(String path) {
-        this.basePath = path;
-    }
-
-    public void setKeepExisting(Boolean keep) {
-        this.keepExisting = keep;
-    }
-
-    public String getBasePath() {
-        return this.basePath;
-    }
-
-    public Boolean keepExisting() {
-        return this.keepExisting;
-    }
-
     public Download() {}
-
-    /**
-     * Initialize from URL string
-     *
-     * @param url
-     */
-    public Download(String url) {
-        try {
-            this.urlString = url;
-            this.url = new URL(url);
-            this.setStatus(Status.INITIALIZED);
-        } catch (MalformedURLException e) {
-            this.status = Status.FAILED;
-            this.error = e;
-        }
-    }
 
     /**
      * Initialize from DownloadRequest object
@@ -146,36 +126,31 @@ public class Download {
      */
     public Download(DownloadRequest request) {
         try {
+            setName("Download" + getName());
             this.urlString = request.url;
             this.header.addAll(header);
             if (request.method.toLowerCase().equals("post")) this.method = HttpMethod.POST;
             this.destination = request.destination;
             this.url = new URL(request.url);
-            this.setStatus(Status.INITIALIZED);
+            setStatus(Status.INITIALIZED);
+            System.out.println(String.format("%s initialized:\n - Source: %s\n - Destination: %s",
+                    getName(),
+                    this.urlString,
+                    this.destination == null ? "*unspecified*" : this.destination
+            ));
         } catch (MalformedURLException e) {
             this.status = Status.FAILED;
             this.error = e;
         }
     }
 
-    @Bean
-    @Scope("prototype")
-    public Download newDownload(DownloadRequest request) {
-        Download d = new Download(request);
-        d.setBasePath(this.basePath);
-        d.setKeepExisting(this.keepExisting);
-        return d;
-    }
-
     /**
      * Set new status
      *
      * @param newStatus
-     * @return
      */
-    private Download setStatus(Status newStatus) {
+    private void setStatus(Status newStatus) {
         this.status = newStatus;
-        return this;
     }
 
     public URL getUrl() {
@@ -293,14 +268,15 @@ public class Download {
         }
     }
 
-//    @PostConstruct
-    public void start() {
+    public void run() {
         try {
             setStatus(Status.PROGRESSING);
             prepareRequest();
             initializeDestination();
             if (this.connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                System.out.println(String.format("%s ok: Starting download (%s)", getName(), getSizeHumanReadable()));
                 Files.copy(this.connection.getInputStream(), Paths.get(this.basePath, this.destination));
+                System.out.println(String.format("%s successfully finished", getName()));
                 this.connection.disconnect();
                 setStatus(Status.SUCCEEDED);
             } else {
@@ -317,7 +293,7 @@ public class Download {
     }
 
     @JsonIgnore
-    public void pause() {
+    public void pauseDownload() {
         try {
             this.connection.disconnect();
         } catch (Exception e) {
@@ -328,7 +304,7 @@ public class Download {
     }
 
     @JsonIgnore
-    public void resume() {
+    public void resumeDownload() {
         try {
             HttpURLConnection headRequest = (HttpURLConnection) this.url.openConnection();
             headRequest.setRequestMethod("HEAD");
@@ -343,5 +319,22 @@ public class Download {
             this.error = e;
             if (this.connection != null) this.connection.disconnect();
         }
+    }
+
+    public void setBasePath(String basePath) {
+        if (this.basePath == null) this.basePath = basePath;
+    }
+
+    public void setKeepExisting(Boolean keepExisting) {
+        if (this.keepExisting == null) this.keepExisting = keepExisting;
+    }
+
+    public String getSizeHumanReadable() {
+        long bytes = this.connection.getContentLengthLong();
+        int unit = 1024;
+        if (bytes < unit) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        char pre = ("KMGTPE").charAt(exp-1);
+        return String.format("%.1f %ciB", bytes / Math.pow(unit, exp), pre);
     }
 }

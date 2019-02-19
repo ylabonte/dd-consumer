@@ -9,8 +9,11 @@ known downloads (current and history).
 
 For an appropriate Chrome browser extension see: https://github.com/ylabonte/chrome-simple-download-delegator
 
-**At current development state, there is no real download processing
-implemented yet!**
+This implementation is rudimentary and offers absolutely no security 
+features! I strongly discourage from productive use (accessible from
+the internet)! Access to this server application should only be possible 
+through an appropriately configured reverse proxy using up-to-date TLS 
+setup and adding a HTTP Basic Auth mechanism.
 
 ## Requirements
 * Java 8

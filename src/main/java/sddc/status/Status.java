@@ -29,12 +29,6 @@ public class Status {
 
     private Status() {
         this.downloads = new ArrayList<>();
-        try {
-//            this.downloads.add(new Download("http://www.example.com", "/tmp"));
-//            this.downloads.add(new Download("https://gist.githubusercontent.com/ylabonte/79d36b4f17635d7661bcac75677cd216/raw/7139d45328fe2300595beb946eb4d3c5647df2b7/DownloadRequests.schema.json", "/tmp"));
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
     }
 
     @JsonIgnore
@@ -43,6 +37,10 @@ public class Status {
             Status.instance = new Status();
         }
         return Status.instance;
+    }
+
+    public void addDownload(Download download) {
+        this.downloads.add(download);
     }
 
     public List<Download> getDownloads() {
