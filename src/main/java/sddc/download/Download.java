@@ -276,7 +276,10 @@ public class Download extends Thread {
             if (this.connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 System.out.println(String.format("%s ok: Starting download (%s)", getName(), getSizeHumanReadable()));
                 Files.copy(this.connection.getInputStream(), Paths.get(this.basePath, this.destination));
-                System.out.println(String.format("%s successfully finished", getName()));
+                System.out.println(String.format("%s successfully finished (%s)",
+                        getName(),
+                        Paths.get(this.basePath, this.destination).toAbsolutePath().toString()
+                ));
                 this.connection.disconnect();
                 setStatus(Status.SUCCEEDED);
             } else {

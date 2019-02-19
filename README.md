@@ -15,35 +15,52 @@ the internet)! Access to this server application should only be possible
 through an appropriately configured reverse proxy using up-to-date TLS 
 setup and adding a HTTP Basic Auth mechanism.
 
-## Requirements
+## Run using Docker
+
+Simply clone the repo, build the image and run the container as usual.
+```bash
+$ git clone https://github.com/ylabonte/simple-download-delegation-consumer.git sddc
+$ cd sddc
+$ docker build sddc:latest .
+$ docker run -it --rm --name sddc \
+     -v ${HOME}/Downloads:/root/Downloads 
+     -v $(pwd)/application.properties:/root/application.properties
+     -p 1040:1040 sddc:latest
+``` 
+
+## Run in your local JVM
+
+### Requirements
 * Java 8
 * Gradle 5
 
-## Run
+### Run
 ```bash
 $ gradle bootRun
 ```
 This will build, test and run the project for you.
 
-## Build
+### Build
 This will (re)build the project (`bootRun` also does). Useful if you
 only want the JAR file for execution.
 ```bash
 $ gradle build
 ```
 
-## Test
+### Test
 Only run tests. Useful during development.
 ```bash
 $ gradle test
 ```
 
-## Request status
+## How it works
+
+### Getting status
 ```bash
 $ curl 'localhost:1040'
 ```
 
-## Request download(s)
+### Requesting download(s)
 ```bash
 $ curl 'localhost:1040' \
 -H 'Content-Type: application/json; charset=utf-8' \
