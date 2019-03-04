@@ -1,0 +1,3 @@
+Just create an issue related to this project on github or contribute 
+by staging pull requests. Your pull requests should contain a description
+of your intention as your issue tickets should do as well...
