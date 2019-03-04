@@ -1,24 +1,15 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.asynchttpclient:async-http-client:2.0.3")
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
-    }
+plugins {
+    id "java"
+    id "eclipse"
+    id "idea"
+    id "org.springframework.boot" version "2.1.3.RELEASE"
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
-
 group 'de.yalab'
-version System.getenv("BUILD_VERSION") ?: "latest"
+version = System.getenv("BUILD_VERSION") ?: "latest"
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 bootJar {
     baseName = 'ddc'
@@ -31,7 +22,6 @@ repositories {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.asynchttpclient:async-http-client:2.0.3")
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    compile("org.springframework.boot:spring-boot-starter-web:2.1.3.RELEASE")
+    testCompile('org.springframework.boot:spring-boot-starter-test:2.1.3.RELEASE')
 }

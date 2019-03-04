@@ -41,12 +41,11 @@ $ docker run -it --rm --name ddc \
 ## Run in your local JVM
 
 ### Requirements
-* Java 8
-* Gradle 5
+* Java 11
 
 ### Run
 ```bash
-$ gradle bootRun
+$ ./gradlew bootRun
 ```
 This will build, test and run the project for you.
 
@@ -54,13 +53,13 @@ This will build, test and run the project for you.
 This will (re)build the project (`bootRun` also does). Useful if you
 only want the JAR file for execution.
 ```bash
-$ gradle build
+$ ./gradlew build
 ```
 
 ### Test
 Only run tests. Useful during development.
 ```bash
-$ gradle test
+$ ./gradlew test
 ```
 
 ## How it works
