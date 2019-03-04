@@ -1,4 +1,4 @@
-package sddc.status;
+package de.yalab.ddc.status;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

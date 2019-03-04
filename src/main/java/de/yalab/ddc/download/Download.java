@@ -1,4 +1,4 @@
-package sddc.download;
+package de.yalab.ddc.download;
 
 import com.fasterxml.jackson.annotation.*;
 import org.slf4j.Logger;

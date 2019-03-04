@@ -15,14 +15,15 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 group 'de.yalab'
-version '1.0-SNAPSHOT'
+version System.getenv("BUILD_VERSION") ?: "latest"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 bootJar {
-    baseName = 'sddc'
-    version =  '0.1.0'
+    baseName = 'ddc'
+    version = System.getenv("BUILD_VERSION") ?: "latest"
+    mainClassName = 'de.yalab.ddc.Application'
 }
 
 repositories {

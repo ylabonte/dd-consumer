@@ -1,4 +1,4 @@
-package sddc.download;
+package de.yalab.ddc.download;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

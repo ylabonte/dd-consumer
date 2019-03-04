@@ -1,15 +1,15 @@
-package sddc.status;
+package de.yalab.ddc.status;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import sddc.download.Download;
+import de.yalab.ddc.download.Download;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The Status class holds a list of all downloads as part of the application sddc.status
+ * The Status class holds a list of all downloads as part of the application DownloadService.status
  * and therefore implements a thread safe singleton pattern.
  */
 @JsonPropertyOrder({

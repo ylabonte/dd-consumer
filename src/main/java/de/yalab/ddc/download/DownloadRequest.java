@@ -1,4 +1,4 @@
-package sddc.download;
+package de.yalab.ddc.download;
 
 import java.util.ArrayList;
 import java.util.List;
