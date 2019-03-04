@@ -2,7 +2,7 @@
 # ddc - <small>a simple Download Delegation Consumer</small>
 
 A [Spring](https://spring.io/) based web service consuming delegated
-downloads ([see json schema here](https://gist.github.com/ylabonte/79d36b4f17635d7661bcac75677cd216#file-downloadrequests-schema-json))
+downloads ([see json schema here](https://github.com/ylabonte/dd-json-schema))
 which are http `POST`ed as `Content-Type: application/json; charset=utf-8`
 to the root route `http://<service-address>:1040/`.
 A simple `GET` request to the same route gives a brief status of all
@@ -10,7 +10,7 @@ known downloads (current and history).
 
 For an appropriate Chrome browser extension which is capable of 
 delegating downloads from your browser to your instance of the ddc see: 
-https://github.com/ylabonte/chrome-simple-download-delegator
+https://github.com/ylabonte/dd-chrome-extension
 
 This implementation is rudimentary and offers absolutely no security 
 features! I strongly discourage from productive use (accessible from
