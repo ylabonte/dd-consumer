@@ -16,17 +16,26 @@ This implementation is rudimentary and offers absolutely no security
 features! I strongly discourage from productive use (accessible from
 the internet)!
 
+## Run using docker via dockerhub
+You can run the app by simply using the prebuilt docker image from 
+dockerhub:
+```bash
+$ docker run -it --rm --name ddc \
+     -v ${HOME}/Downloads:/root/Downloads \
+     -p 1040:1040 labonte/ddc:latest \
+```
+
 ## Run using self built docker image
 
 Simply clone the repo, build the image and run the container as usual.
 ```bash
-$ git clone https://github.com/ylabonte/download-delegation-consumer.git sddc
-$ cd sddc
-$ docker build sddc:latest .
-$ docker run -it --rm --name sddc \
-     -v ${HOME}/Downloads:/root/Downloads 
-     -v $(pwd)/application.properties:/root/application.properties
-     -p 1040:1040 sddc:latest
+$ git clone https://github.com/ylabonte/ddc.git ddc
+$ cd ddc
+$ docker build ddc:latest .
+$ docker run -it --rm --name ddc \
+     -v ${HOME}/Downloads:/root/Downloads \
+     -v $(pwd)/application.properties:/root/application.properties \
+     -p 1040:1040 ddc:latest
 ``` 
 
 ## Run in your local JVM
