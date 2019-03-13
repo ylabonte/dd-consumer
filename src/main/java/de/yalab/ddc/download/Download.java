@@ -38,12 +38,14 @@ import java.util.regex.Pattern;
 @JsonIgnoreProperties({
     "threadGroup",
     "contextClassLoader",
+    "error",
     "stackTrace",
     "allStackTraces",
     "Threads",
     "uncaughtExceptionHandler",
     "defaultUncaughtExceptionHandler",
-    "uncaughtExceptionHandler"
+    "uncaughtExceptionHandler",
+    "sizeHumanReadable"
 })
 public class Download extends Thread {
 
