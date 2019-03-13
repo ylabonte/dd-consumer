@@ -11,15 +11,14 @@ RUN echo "${BUILD_VERSION}" > build/libs/build.version
 
 
 FROM openjdk:11-jre-slim
-ENV BUILD_VERSION $build_version
-COPY --from=builder /app/build/libs/* /root/
+ENV JAVA_ARGS -Xms64m -Xmx768m
+RUN apt-get update && apt-get -y install libtcnative-1=1.2.21-1~bpo9+1
+COPY --from=builder /app/build/libs /app
 COPY ./docker-entrypoint.sh /
-RUN chmod u+x /docker-entrypoint.sh
 VOLUME /root/Downloads
-VOLUME /root/application.settings
-WORKDIR /root
+WORKDIR /app
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/docker-entrypoint.sh"]
 CMD ["start"]
 
 EXPOSE 1040
