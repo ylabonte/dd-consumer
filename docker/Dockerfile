@@ -1,12 +1,11 @@
 FROM gradle:5.3-jdk11 as builder
-ARG build_version
-ENV BUILD_VERSION $build_version
+ARG build_version=latest
 
 COPY . /app
 WORKDIR /app
 USER root
 RUN gradle && gradle bootJar
-RUN echo "${BUILD_VERSION}" > build/libs/build.version
+RUN echo $build_version > build/libs/build.version
 
 
 FROM openjdk:11-jre-slim
@@ -14,12 +13,12 @@ ENV JAVA_ARGS -Xms64m -Xmx768m
 RUN apt-get update &&\
     apt-get -y install libtcnative-1=1.2.21-1~bpo9+1 &&\
     apt-get -y clean
-RUN printf "export BUILD_VERSION=%s\n" $(echo 213) >> /etc/environment
 COPY --from=builder /app/build/libs /app
 COPY docker/docker-entrypoint.sh /
 VOLUME /root/Downloads
 WORKDIR /app
 
+RUN printf "export BUILD_VERSION=%s\n" $(cat build.version) >> /etc/environment
 ENTRYPOINT ["/bin/sh", "/docker-entrypoint.sh"]
 CMD ["start"]
 
