@@ -37,7 +37,7 @@ Simply clone the repo, build the image and run the container as usual.
 ```bash
 $ git clone https://github.com/ylabonte/ddc.git ddc
 $ cd ddc
-$ docker build ddc:latest .
+$ docker build -f docker/Dockerfile ddc:latest .
 $ docker run -it --rm --name ddc \
      -v ${HOME}/Downloads:/root/Downloads \
      -v $(pwd)/application.properties:/root/application.properties \

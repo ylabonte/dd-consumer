@@ -130,7 +130,7 @@ public class Download extends Thread {
         try {
             setName("Download" + getName());
             this.urlString = request.url;
-            this.header.addAll(header);
+            this.header.addAll(request.header);
             if (request.method.toLowerCase().equals("post")) this.method = HttpMethod.POST;
             this.destination = request.destination;
             this.url = new URL(request.url);
@@ -206,7 +206,7 @@ public class Download extends Thread {
         this.connection.setInstanceFollowRedirects(true);
         this.connection.setRequestMethod(this.method.name());
         for (String header: this.header) {
-            String[] headerParts = header.split("/[ ]*:[ ]*/");
+            String[] headerParts = header.split("[ ]*:[ ]*");
             if (headerParts.length != 2) continue;
             this.connection.setRequestProperty(headerParts[0], headerParts[1]);
         }
