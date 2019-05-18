@@ -1,5 +1,6 @@
 FROM gradle:5.3-jdk11 as builder
 ARG build_version=latest
+ENV BUILD_VERSION $build_version
 
 COPY . /app
 WORKDIR /app

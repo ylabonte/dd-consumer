@@ -253,6 +253,9 @@ public class Download extends Thread {
             String contentDispositionHeader = this.connection.getHeaderField("Content-Disposition");
             if (contentDispositionHeader != null && contentDispositionHeader.contains("=")) {
                 this.destination = contentDispositionHeader.split("=")[1];
+                if (this.destination.startsWith("\"") && this.destination.endsWith("\"")) {
+                    this.destination = this.destination.substring(1, this.destination.length() - 1);
+                }
             } else if (!this.getUrl().getFile().equals("")) {
                 String[] urlPath = this.getUrl().getFile().split("/");
                 this.destination = urlPath[urlPath.length - 1];
