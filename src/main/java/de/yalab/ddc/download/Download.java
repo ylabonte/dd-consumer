@@ -194,6 +194,10 @@ public class Download extends Thread {
 
     public long getSize() { return this.size; }
 
+    private long lastMeasureValue = 0;
+
+    private long lastMeasure = 0;
+
     public double getProgress() {
         if (this.size < 1 || this.destination == null) {
             return 0;
@@ -319,7 +323,8 @@ public class Download extends Thread {
                 this.logger.info(String.format("%s ok: Starting download (%s)", getName(), getHumanReadableSize()));
 //                System.out.println(String.format("%s ok: Starting download (%s)", getName(), getHumanReadableSize()));
                 this.size = this.connection.getContentLengthLong();
-                Files.copy(this.connection.getInputStream(), Paths.get(this.basePath, this.destination));
+                this.file = Paths.get(this.basePath, this.destination).toFile();
+                Files.copy(this.connection.getInputStream(), this.file.toPath());
                 this.logger.info(String.format("%s successfully finished (%s)",
                         getName(),
                         Paths.get(this.basePath, this.destination).toAbsolutePath().toString()
@@ -387,12 +392,6 @@ public class Download extends Thread {
         }
 
         return toHumanReadableSize(this.connection.getContentLengthLong());
-//        long bytes = this.connection.getContentLengthLong();
-//        int unit = 1024;
-//        if (bytes < unit) return bytes + " B";
-//        int exp = (int) (Math.log(bytes) / Math.log(unit));
-//        char pre = ("KMGTPE").charAt(exp-1);
-//        return String.format("%.1f %ciB", bytes / Math.pow(unit, exp), pre);
     }
 
     public long getFileSize() {
@@ -419,5 +418,53 @@ public class Download extends Thread {
         }
 
         return String.format("%.1f %ciB", bytes / Math.pow(unit, exp), prefix);
+    }
+
+    protected String toHumanReadableSpeed(long bytes) {
+        int unit = 1000;
+        if (bytes < unit) return (bytes < 0 ? 0 : bytes) + " B/s";
+        double value;
+        char prefix;
+        int exp;
+
+        try {
+            exp = (int) (Math.log(bytes) / Math.log(unit));
+            prefix = ("KMGTPE").charAt(exp - 1);
+        } catch (IndexOutOfBoundsException e) {
+            exp = 6;
+            prefix = 'E';
+        }
+
+        return String.format("%.1f %cB/s", bytes / Math.pow(unit, exp), prefix);
+    }
+
+    private long getMeasureSpeedValue() {
+        if (this.size == 0 || this.fileSize == 0 || this.file == null) {
+            return 0;
+        }
+
+        long now = System.currentTimeMillis();
+        if (lastMeasure - now < -1000) {
+            this.lastMeasure = now;
+            try {
+                long fileSize0 = this.file.length();
+                sleep(250);
+
+                this.lastMeasureValue = (this.file.length() - fileSize0) * 4;
+            } catch (Exception e) {
+                this.lastMeasureValue = 0;
+            }
+        }
+
+        return this.lastMeasureValue;
+
+    }
+
+    public long getSpeed() {
+        return getMeasureSpeedValue();
+    }
+
+    public String getHumanReadableSpeed() {
+        return toHumanReadableSpeed(getSpeed());
     }
 }
