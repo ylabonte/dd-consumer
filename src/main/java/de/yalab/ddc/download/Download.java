@@ -30,7 +30,10 @@ import java.util.regex.Pattern;
     "url",
     "method",
     "destination",
+    "size",
     "status",
+    "progress",
+    "fileSize",
     "message",
     "erroneous",
     "error"
@@ -44,8 +47,7 @@ import java.util.regex.Pattern;
     "Threads",
     "uncaughtExceptionHandler",
     "defaultUncaughtExceptionHandler",
-    "uncaughtExceptionHandler",
-    "sizeHumanReadable"
+    "uncaughtExceptionHandler"
 })
 public class Download extends Thread {
 
@@ -85,6 +87,11 @@ public class Download extends Thread {
     private Status status = Status.UNINITIALIZED;
 
     /**
+     * Download file size in byte.
+     */
+    private long size = 0;
+
+    /**
      * In case of an error, this is the exception that should give the reason
      */
     private Exception error = null;
@@ -106,6 +113,10 @@ public class Download extends Thread {
     private Logger logger = LoggerFactory.getLogger(Download.class);
 
     private String hash;
+
+    private long fileSize = 0;
+
+    private long fileSizeUpdate = 0;
 
     /**
      * Download status values
@@ -135,11 +146,16 @@ public class Download extends Thread {
             this.destination = request.destination;
             this.url = new URL(request.url);
             setStatus(Status.INITIALIZED);
-            System.out.println(String.format("%s initialized:\n - Source: %s\n - Destination: %s",
+            this.logger.info(String.format("Download initialized:\n- Name: %s\n - Source: %s\n - Destination: %s",
                     getName(),
                     this.urlString,
                     this.destination == null ? "*unspecified*" : this.destination
             ));
+//            System.out.println(String.format("Download initialized:\n- Name: %s\n - Source: %s\n - Destination: %s",
+//                    getName(),
+//                    this.urlString,
+//                    this.destination == null ? "*unspecified*" : this.destination
+//            ));
         } catch (MalformedURLException e) {
             this.status = Status.FAILED;
             this.error = e;
@@ -174,6 +190,27 @@ public class Download extends Thread {
 
     public Status getStatus() {
         return this.status;
+    }
+
+    public long getSize() { return this.size; }
+
+    public double getProgress() {
+        if (this.size < 1 || this.destination == null) {
+            return 0;
+        }
+
+        File file = Paths.get(this.basePath, this.destination).toFile();
+        if (!file.exists() || !file.isFile()) {
+            this.fileSize = 0;
+        }
+
+        long now = System.currentTimeMillis();
+        if (this.fileSizeUpdate - now < -1000) {
+            this.fileSize = file.length();
+            this.fileSizeUpdate = now;
+        }
+
+        return (double) this.fileSize / (double) this.size;
     }
 
     public String getMessage() {
@@ -279,15 +316,22 @@ public class Download extends Thread {
             prepareRequest();
             initializeDestination();
             if (this.connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                System.out.println(String.format("%s ok: Starting download (%s)", getName(), getSizeHumanReadable()));
+                this.logger.info(String.format("%s ok: Starting download (%s)", getName(), getHumanReadableSize()));
+//                System.out.println(String.format("%s ok: Starting download (%s)", getName(), getHumanReadableSize()));
+                this.size = this.connection.getContentLengthLong();
                 Files.copy(this.connection.getInputStream(), Paths.get(this.basePath, this.destination));
-                System.out.println(String.format("%s successfully finished (%s)",
+                this.logger.info(String.format("%s successfully finished (%s)",
                         getName(),
                         Paths.get(this.basePath, this.destination).toAbsolutePath().toString()
                 ));
+//                System.out.println(String.format("%s successfully finished (%s)",
+//                        getName(),
+//                        Paths.get(this.basePath, this.destination).toAbsolutePath().toString()
+//                ));
                 this.connection.disconnect();
                 setStatus(Status.SUCCEEDED);
             } else {
+                this.logger.error("Download failed due to HTTP server error response");
                 throw new HttpServerErrorException(
                         HttpStatus.valueOf(this.connection.getResponseCode()),
                         this.connection.getResponseMessage()
@@ -337,12 +381,43 @@ public class Download extends Thread {
         if (this.keepExisting == null) this.keepExisting = keepExisting;
     }
 
-    public String getSizeHumanReadable() {
-        long bytes = this.connection.getContentLengthLong();
+    public String getHumanReadableSize() {
+        if (this.connection == null) {
+            return "";
+        }
+
+        return toHumanReadableSize(this.connection.getContentLengthLong());
+//        long bytes = this.connection.getContentLengthLong();
+//        int unit = 1024;
+//        if (bytes < unit) return bytes + " B";
+//        int exp = (int) (Math.log(bytes) / Math.log(unit));
+//        char pre = ("KMGTPE").charAt(exp-1);
+//        return String.format("%.1f %ciB", bytes / Math.pow(unit, exp), pre);
+    }
+
+    public long getFileSize() {
+        return this.fileSize;
+    }
+
+    public String getHumanReadableFileSize() {
+        return toHumanReadableSize(this.fileSize);
+    }
+
+    protected String toHumanReadableSize(long bytes) {
         int unit = 1024;
-        if (bytes < unit) return bytes + " B";
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
-        char pre = ("KMGTPE").charAt(exp-1);
-        return String.format("%.1f %ciB", bytes / Math.pow(unit, exp), pre);
+        if (bytes < unit) return (bytes < 0 ? 0 : bytes) + " B";
+        double value;
+        char prefix;
+        int exp;
+
+        try {
+            exp = (int) (Math.log(bytes) / Math.log(unit));
+            prefix = ("KMGTPE").charAt(exp - 1);
+        } catch (IndexOutOfBoundsException e) {
+            exp = 6;
+            prefix = 'E';
+        }
+
+        return String.format("%.1f %ciB", bytes / Math.pow(unit, exp), prefix);
     }
 }
