@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.yalab.ddc.download.Download;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -25,10 +27,13 @@ public class Status {
 
     private static Status instance;
 
-    private final ArrayList<Download> downloads;
+    private final List<Download> downloads;
+
+    private final Map<Long, Download> _downloads;
 
     private Status() {
         this.downloads = new ArrayList<>();
+        this._downloads = new HashMap<>();
     }
 
     @JsonIgnore
@@ -41,6 +46,7 @@ public class Status {
 
     public void addDownload(Download download) {
         this.downloads.add(download);
+        this._downloads.put(download.getId(), download);
     }
 
     public List<Download> getDownloads() {
@@ -82,5 +88,16 @@ public class Status {
         return this.downloads.stream().filter(download ->
             download.getStatus().compareTo(Download.Status.SUCCEEDED) >= 0
         ).collect(Collectors.toList());
+    }
+
+    public Download getDownload(long id) {
+        return this._downloads.get(id);
+    }
+
+    public void removeDownload(long id) {
+        Download download = this._downloads.get(id);
+        download.pauseDownload();
+        this.downloads.remove(download);
+        this._downloads.remove(id);
     }
 }
