@@ -24,16 +24,20 @@ import java.util.regex.Pattern;
 @Scope("prototype")
 @ConfigurationProperties(prefix = "download")
 @JsonPropertyOrder({
+    "id",
     "url",
     "method",
     "destination",
     "size",
+    "hSize",
     "status",
     "progress",
+    "speed",
+    "hSpeed",
     "fileSize",
-    "message",
+    "hFileSize",
     "erroneous",
-    "error"
+    "message"
 })
 @JsonIgnoreProperties({
     "threadGroup",
@@ -42,6 +46,12 @@ import java.util.regex.Pattern;
     "stackTrace",
     "allStackTraces",
     "Threads",
+    "priority",
+    "interrupted",
+    "daemon",
+    "state",
+    "alive",
+    "name",
     "uncaughtExceptionHandler",
     "defaultUncaughtExceptionHandler",
     "uncaughtExceptionHandler"
@@ -51,7 +61,7 @@ public class Download extends Thread {
     /**
      * Placeholder message, when no error occurred
      */
-    private final static String MESSAGE_OK = "No errors. Everything fine! =)";
+    private final static String MESSAGE_OK = "";
 
     /**
      * Plain list of http headers to send with the download request
@@ -239,6 +249,7 @@ public class Download extends Thread {
         if (this.keepExisting == null) this.keepExisting = keepExisting;
     }
 
+    @JsonProperty("hSize")
     public String getHumanReadableSize() {
         if (this.connection == null) {
             return "";
@@ -251,6 +262,7 @@ public class Download extends Thread {
         return this.fileSize;
     }
 
+    @JsonProperty("hFileSize")
     public String getHumanReadableFileSize() {
         return toHumanReadableSize(this.fileSize);
     }
@@ -281,6 +293,7 @@ public class Download extends Thread {
         return getMeasureSpeedValue();
     }
 
+    @JsonProperty("hSpeed")
     public String getHumanReadableSpeed() {
         return toHumanReadableSpeed(getSpeed());
     }

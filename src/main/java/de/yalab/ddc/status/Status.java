@@ -53,30 +53,35 @@ public class Status {
         return this.downloads;
     }
 
+    @JsonIgnore
     public List<Download> getWaitingDownloads() {
         return this.downloads.stream().filter(download ->
             download.getStatus().equals(Download.Status.WAITING)
         ).collect(Collectors.toList());
     }
 
+    @JsonIgnore
     public List<Download> getProgressingDownloads() {
         return this.downloads.stream().filter(download ->
             download.getStatus().equals(Download.Status.PROGRESSING)
         ).collect(Collectors.toList());
     }
 
+    @JsonIgnore
     public List<Download> getSucceededDownloads() {
         return this.downloads.stream().filter(download ->
             download.getStatus().equals(Download.Status.SUCCEEDED)
         ).collect(Collectors.toList());
     }
 
+    @JsonIgnore
     public List<Download> getFailedDownloads() {
         return this.downloads.stream().filter(download ->
             download.getStatus().equals(Download.Status.FAILED)
         ).collect(Collectors.toList());
     }
 
+    @JsonIgnore
     public List<Download> getCurrentDownloads() {
         return this.downloads.stream().filter(download ->
             download.getStatus().compareTo(Download.Status.INITIALIZED) > 0 &&
@@ -84,16 +89,19 @@ public class Status {
         ).collect(Collectors.toList());
     }
 
+    @JsonIgnore
     public List<Download> getDownloadHistory() {
         return this.downloads.stream().filter(download ->
             download.getStatus().compareTo(Download.Status.SUCCEEDED) >= 0
         ).collect(Collectors.toList());
     }
 
+    @JsonIgnore
     public Download getDownload(long id) {
         return this._downloads.get(id);
     }
 
+    @JsonIgnore
     public void removeDownload(long id) {
         Download download = this._downloads.get(id);
         download.pauseDownload();

@@ -61,19 +61,74 @@ Custom application settings are:
 ## API
 
 ### Getting status
+A simple `GET` request to the server root will return an object with an
+overview of all registered downloads. Those downloads may be listed
+multiple times under different keys. You can use the following example
+to pretty print the current status object to your console or just open
+the address in your favorite browser.
 ```bash
-$ curl 'localhost:1040'
+$ curl 'localhost:1040' | jq
 ```
 
-### Requesting download(s)
+The response should look something similar to:
+```json
+{
+  "downloads": [
+    {
+      "id": 38,
+      "url": "https://material.io/tools/icons/static/icons/baseline-cloud_download-24px.svg",
+      "method": "GET",
+      "destination": "baseline-cloud_download-24px_1.svg",
+      "size": -1,
+      "hSize": "0 B",
+      "status": "SUCCEEDED",
+      "progress": 0,
+      "speed": 0,
+      "hSpeed": "0 B/s",
+      "fileSize": 0,
+      "hFileSize": "0 B",
+      "erroneous": false,
+      "message": ""
+    }
+  ]
+}
+```
+
+#### Status Object
+| Key | Value | Description |
+|---|---|---|
+| `downloads` | `Download[]` | A list of all registered downloads.
+
+#### Download Object
+| Key | Value | Description |
+|---|---|---|
+| `id` | `number` | Unique identifier (per instance). |
+| `url` | `string` | Download URL. Target URL in case of redirects. |
+| `method` | `string` | HTTP request method. |
+| `destination` | `string` | Download destination (relative to the configured download base path). |
+| `size` | `number` | File size given by the HTTP Content-Length header. |
+| `hSize` | `string` | Same as `size` but as human readable string with appropriate unit. |
+| `status` | `string` | One of `UNINITIALIZED`, `INITIALIZED`, `WAITING`, `PROGRESSING`, `PAUSED`, `SUCCEEDED`, `FAILED`, `ABORTED`. |
+| `progress` | `number` | Floating point number between 0 and 1 indicating the progress. |
+| `speed` | `number` | Number of bytes written in the last 200ms. |
+| `hSpeed` | `string` | Same as `speed` but as human readable string with appropriate unit. |
+| `fileSize` | `number` | Actual file size in bytes. |
+| `hFileSize` | `string` | Same as `fileSize` but as human readable string with appropriate unit. |
+| `erroneous` | `boolean` | Indicates whether an error occurred. |
+| `message` | `string` | Error message when `erroneous` is `true`. |
+
+
+### Adding a download
+
+
 ```bash
 $ curl 'localhost:1040' \
 -H 'Content-Type: application/json; charset=utf-8' \
--d '{
+-d '[{
   "url": "http://example.com/info.txt",
   "header": ["Cookie: auth-session-cookie=some-hash"],
   "destination": "very-important/info.txt"
-}'
+}]' | json_pp
 ```
 This will try to download the file from `http://example.com/info.txt`
 using the supplied http cookie header and saves it to
@@ -81,6 +136,9 @@ using the supplied http cookie header and saves it to
 
 
 ## Development
+It's open source, so you may simply clone or fork the repository to 
+perform some customizations or what ever you want to do.
+You are very welcome to stage a pull request.  
 
 ### Requirements
 * Java 11
